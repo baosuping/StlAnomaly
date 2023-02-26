@@ -120,11 +120,6 @@ class STformer(nn.Module):
                     activation=activation
                 ) for l in range(e_layers)
             ],
-            # [
-            #     ConvLayer(
-            #         d_model
-            #     ) for l in range(e_layers-1)
-            # ] if distil else None,
             norm_layer=my_Layernorm(d_model)
         )
 
