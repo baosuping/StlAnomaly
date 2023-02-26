@@ -41,7 +41,7 @@ class Exp_Informer(Exp_Basic):
                 self.args.factor,
                 self.args.d_model, 
                 self.args.n_heads, 
-                e_layers, # self.args.e_layers,
+                self.args.e_layers,# e_layers, 
                 self.args.d_layers, 
                 self.args.d_ff,
                 self.args.dropout, 
