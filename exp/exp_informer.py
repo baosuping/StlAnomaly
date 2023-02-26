@@ -56,7 +56,7 @@ class Exp_Informer(Exp_Basic):
             ).float()
         
         if self.args.model=='STformer':
-            e_layers = self.args.e_layers if self.args.model=='informer' else self.args.s_layers
+            e_layers = self.args.e_layers 
             model = model_dict[self.args.model](
                 self.args.enc_in,
                 self.args.dec_in, 
