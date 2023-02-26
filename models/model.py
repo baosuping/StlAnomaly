@@ -118,7 +118,7 @@ class STformer(nn.Module):
                     moving_avg=moving_avg,
                     dropout=dropout,
                     activation=activation
-                ) for l in range(len(e_layers))
+                ) for l in range(e_layers)
             ],
             # [
             #     ConvLayer(
