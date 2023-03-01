@@ -269,8 +269,8 @@ class Exp_Informer(Exp_Basic):
         test_data, test_loader = self._get_data(flag='test')
 
         path = os.path.join(args.root_path, args.data_path)
-        ## 注意分号还是逗号
-        df_raw = pd.read_csv(path, sep=',', parse_dates=True)
+        ## 注意分号还是逗号!!  修改 SKAB是分号，KPI是逗号
+        df_raw = pd.read_csv(path, sep=';', parse_dates=True)
 
         self.model.eval()
 
@@ -290,6 +290,10 @@ class Exp_Informer(Exp_Basic):
         trues = trues.reshape(-1, trues.shape[-2], trues.shape[-1])
         print('test shape:', preds.shape, trues.shape)
         
+        # 反归一化之前计算误差
+        mae, mse, rmse, mape, mspe = metric(preds, trues)
+        print('mse:{}, mae:{}'.format(mse, mae))
+        
         # 反归一化
         preds = test_data.inverse_transform(preds)
 
@@ -297,9 +301,6 @@ class Exp_Informer(Exp_Basic):
         folder_path = './results/' + setting + '/'
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
-
-        mae, mse, rmse, mape, mspe = metric(preds, trues)
-        print('mse:{}, mae:{}'.format(mse, mae))
 
         np.save(folder_path + 'metrics.npy', np.array([mae, mse, rmse, mape, mspe]))
         np.save(folder_path + 'pred.npy', preds)
