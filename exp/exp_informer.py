@@ -1,4 +1,4 @@
-from data.data_loader import Dataset_ETT_hour, Dataset_ETT_minute, Dataset_Custom, Dataset_Pred, Dataset_SKAB_Anomaly,Dataset_KPI_Anomaly
+from data.data_loader import Dataset_ETT_hour, Dataset_ETT_minute, Dataset_Custom, Dataset_Pred, Dataset_SKAB_Anomaly,Dataset_KPI_Anomaly,Dataset_yahoo_Anomaly
 from exp.exp_basic import Exp_Basic
 from models.model import Informer, InformerStack, STformer
 
@@ -41,7 +41,7 @@ class Exp_Informer(Exp_Basic):
                 self.args.factor,
                 self.args.d_model, 
                 self.args.n_heads, 
-                e_layers,  # self.args.e_layers, 
+                e_layers, # self.args.e_layers,
                 self.args.d_layers, 
                 self.args.d_ff,
                 self.args.dropout, 
@@ -103,6 +103,7 @@ class Exp_Informer(Exp_Basic):
             # 修改
             'SKAB': Dataset_SKAB_Anomaly,
             'KPI': Dataset_KPI_Anomaly,
+            'yahoo':Dataset_yahoo_Anomaly,
         }
         Data = data_dict[self.args.data]
         timeenc = 0 if args.embed!='timeF' else 1
@@ -269,8 +270,8 @@ class Exp_Informer(Exp_Basic):
         test_data, test_loader = self._get_data(flag='test')
 
         path = os.path.join(args.root_path, args.data_path)
-        ## 注意分号还是逗号!!  修改 SKAB是分号，KPI是逗号
-        df_raw = pd.read_csv(path, sep=';', parse_dates=True)
+        ## 注意分号还是逗号!! 修改 SKAB是分号，KPI,yahoo是逗号
+        df_raw = pd.read_csv(path, sep=',', parse_dates=True)
 
         self.model.eval()
 
@@ -293,7 +294,6 @@ class Exp_Informer(Exp_Basic):
         # 反归一化之前计算误差
         mae, mse, rmse, mape, mspe = metric(preds, trues)
         print('mse:{}, mae:{}'.format(mse, mae))
-        
         # 反归一化
         preds = test_data.inverse_transform(preds)
 
@@ -302,14 +302,16 @@ class Exp_Informer(Exp_Basic):
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
+
         np.save(folder_path + 'metrics.npy', np.array([mae, mse, rmse, mape, mspe]))
         np.save(folder_path + 'pred.npy', preds)
         np.save(folder_path + 'true.npy', trues)
 
         # (1088,1,8) -> (1088,8) 把1抹掉
         preds = preds.squeeze(axis=1)
-
-        df_pred = pd.DataFrame(preds, columns=df_raw.columns[1: -2].map(lambda x: x + '_pred'))
+        # 报错 Shape of passed values is (1024, 8), indices imply (1024, 0)
+        # 注意切片的列[2:-1]根据数据调整！！
+        df_pred = pd.DataFrame(preds, columns=df_raw.columns[2: -1].map(lambda x: x + '_pred'))
         df_raw = df_raw.iloc[args.seq_len: args.seq_len + preds.shape[0], :]
         df_raw.reset_index(drop=True, inplace=True)
         df_raw = pd.concat([df_raw, df_pred], axis=1)
