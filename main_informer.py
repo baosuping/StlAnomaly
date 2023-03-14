@@ -4,15 +4,14 @@ import torch
 
 from exp.exp_informer import Exp_Informer
 
-# parser = argparse.ArgumentParser(description='[Informer] Long Sequences Forecasting')
-parser = argparse.ArgumentParser(description='[Autoformer] Time Series Forecasting')
+parser = argparse.ArgumentParser(description='[Informer] Long Sequences Forecasting')
+# parser = argparse.ArgumentParser(description='[Autoformer] Time Series Forecasting')
 
 ## False 命令行不需要指定参数，用默认值
-# parser.add_argument('--model', type=str, required=False, default='informer',help='model of experiment, options: [informer, informerstack, informerlight(TBD)]')
-parser.add_argument('--model', type=str, required=False, default='STformer',help='model of experiment, options: [informer, informerstack, STformer]')
+parser.add_argument('--model', type=str, required=False, default='informer',help='model of experiment, options: [informer, informerstack, informerlight(TBD)]')
+# parser.add_argument('--model', type=str, required=False, default='STformer',help='model of experiment, options: [informer, informerstack, STformer]')
 
 # parser.add_argument('--data', type=str, required=False, default='SKAB', help='data')
-
 # parser.add_argument('--root_path', type=str, default='./data/SKAB/valve2/', help='root path of the data file')
 # parser.add_argument('--data_path', type=str, default='0.csv', help='data file')
 # parser.add_argument('--features', type=str, default='M', help='forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, S:univariate predict univariate, MS:multivariate predict univariate')
@@ -20,16 +19,24 @@ parser.add_argument('--model', type=str, required=False, default='STformer',help
 # parser.add_argument('--freq', type=str, default='s', help='freq for time features encoding, options:[s:secondly, t:minutely, h:hourly, d:daily, b:business days, w:weekly, m:monthly], you can also use more detailed freq like 15min or 3h')
 # parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='location of model checkpoints')
 
-parser.add_argument('--data', type=str, required=False, default='KPI', help='data')
-parser.add_argument('--root_path', type=str, default='./data/KPI/', help='root path of the data file')
+# parser.add_argument('--data', type=str, required=False, default='KPI', help='data')
+# parser.add_argument('--root_path', type=str, default='./data/KPI/', help='root path of the data file')
+# parser.add_argument('--data_path', type=str, default='learningData.csv', help='data file')
+# parser.add_argument('--features', type=str, default='S', help='forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, S:univariate predict univariate, MS:multivariate predict univariate')
+# parser.add_argument('--target', type=str, default='value', help='target feature in S or MS task')
+# parser.add_argument('--freq', type=str, default='s', help='freq for time features encoding, options:[s:secondly, t:minutely, h:hourly, d:daily, b:business days, w:weekly, m:monthly], you can also use more detailed freq like 15min or 3h')
+# parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='location of model checkpoints')
+
+parser.add_argument('--data', type=str, required=False, default='yahoo', help='data')
+parser.add_argument('--root_path', type=str, default='./data/yahoo/', help='root path of the data file')
 parser.add_argument('--data_path', type=str, default='learningData.csv', help='data file')
-parser.add_argument('--features', type=str, default='S', help='forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, S:univariate predict univariate, MS:multivariate predict univariate')
-parser.add_argument('--target', type=str, default='value', help='target feature in S or MS task')
+parser.add_argument('--features', type=str, default='M', help='forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, S:univariate predict univariate, MS:multivariate predict univariate')
+parser.add_argument('--target', type=str, default='value_0', help='target feature in S or MS task')
 parser.add_argument('--freq', type=str, default='s', help='freq for time features encoding, options:[s:secondly, t:minutely, h:hourly, d:daily, b:business days, w:weekly, m:monthly], you can also use more detailed freq like 15min or 3h')
 parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='location of model checkpoints')
 
-parser.add_argument('--seq_len', type=int, required=False, default=96, help='input sequence length of Informer encoder')
-parser.add_argument('--label_len', type=int, required=False, default=48, help='start token length of Informer decoder')
+parser.add_argument('--seq_len', type=int, required=False, default=30, help='input sequence length of Informer encoder')
+parser.add_argument('--label_len', type=int, required=False, default=15, help='start token length of Informer decoder')
 parser.add_argument('--pred_len', type=int, required=False, default=1, help='prediction sequence length')
 # Informer decoder input: concat[start token series(label_len), zero padding series(pred_len)]
 
@@ -43,9 +50,9 @@ parser.add_argument('--pred_len', type=int, required=False, default=1, help='pre
 # parser.add_argument('--enc_in', type=int, default=7, help='encoder input size')
 # parser.add_argument('--dec_in', type=int, default=7, help='decoder input size')
 # parser.add_argument('--c_out', type=int, default=7, help='output size')
-parser.add_argument('--enc_in', type=int, required=False, default=1, help='encoder input size')
-parser.add_argument('--dec_in', type=int, required=False, default=1, help='decoder input size')
-parser.add_argument('--c_out', type=int, required=False, default=1, help='output size')
+parser.add_argument('--enc_in', type=int, required=False, default=5, help='encoder input size')
+parser.add_argument('--dec_in', type=int, required=False, default=5, help='decoder input size')
+parser.add_argument('--c_out', type=int, required=False, default=5, help='output size')
 
 
 parser.add_argument('--d_model', type=int, default=512, help='dimension of model')
@@ -55,7 +62,7 @@ parser.add_argument('--d_layers', type=int, default=1, help='num of decoder laye
 parser.add_argument('--s_layers', type=str, default='3,2,1', help='num of stack encoder layers')
 parser.add_argument('--d_ff', type=int, default=2048, help='dimension of fcn')
 # STformer修改
-parser.add_argument('--moving_avg', type=int, default=25, help='window size of moving average')
+# parser.add_argument('--moving_avg', type=int, default=25, help='window size of moving average')
 
 parser.add_argument('--factor', type=int, default=5, help='probsparse attn factor')
 parser.add_argument('--padding', type=int, default=0, help='padding type')
@@ -71,8 +78,8 @@ parser.add_argument('--cols', type=str, nargs='+', help='certain cols from the d
 parser.add_argument('--num_workers', type=int, default=0, help='data loader num workers')
 ## 做实验的次数 
 parser.add_argument('--itr', type=int, default=1, help='experiments times')
-parser.add_argument('--train_epochs', type=int, default=6, help='train epochs')
-parser.add_argument('--batch_size', type=int, default=32, help='batch size of train input data')
+parser.add_argument('--train_epochs', type=int, default=8, help='train epochs')
+parser.add_argument('--batch_size', type=int, default=10, help='batch size of train input data')
 parser.add_argument('--patience', type=int, default=3, help='early stopping patience')
 parser.add_argument('--learning_rate', type=float, default=0.0001, help='optimizer learning rate')
 
@@ -109,6 +116,7 @@ data_parser = {
     # 修改   parse:encoder输入特征数,decoder输入特征数,decoder输出特征数
     'SKAB':{'data':'0.csv','T':'POWER_136','M':[8,8,8],'S':[1,1,1],'MS':[8,8,1]},
     'KPI': {'data':'learningData.csv','T':'value','M':[1,1,1],'S':[1,1,1],'MS':[1,1,1]},
+    'yahoo': {'data':'learningData.csv','T':'value_0','M':[5,5,5],'S':[1,1,1],'MS':[5,5,1]},
 }
 if args.data in data_parser.keys():
     data_info = data_parser[args.data]
