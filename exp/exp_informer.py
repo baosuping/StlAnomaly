@@ -294,8 +294,7 @@ class Exp_Informer(Exp_Basic):
         # 反归一化之前计算误差
         mae, mse, rmse, mape, mspe = metric(preds, trues)
         print('mse:{}, mae:{}'.format(mse, mae))
-        # 反归一化
-        preds = test_data.inverse_transform(preds)
+
 
         # result save
         folder_path = './results/' + setting + '/'
@@ -309,12 +308,27 @@ class Exp_Informer(Exp_Basic):
 
         # (1088,1,8) -> (1088,8) 把1抹掉
         preds = preds.squeeze(axis=1)
+        trues = trues.squeeze(axis=1)  
+        
+        # KPI 新增一列预测异常列                      
+        residuals = pd.DataFrame(trues - preds).abs().sum(axis=1)
+        UCL = residuals.quantile(0.99)
+        prediction = pd.Series((residuals>3/2*UCL).astype(int).values,index=df_raw[args.seq_len: args.seq_len + preds.shape[0]:].index).fillna(0)
+        predf = prediction.to_frame()
+        predf.columns = ['predicted_anomaly']
+        predf.reset_index(drop=True, inplace=True)
+        
+        # 反归一化
+        preds = test_data.inverse_transform(preds)
         # 报错 Shape of passed values is (1024, 8), indices imply (1024, 0)
         # 注意切片的列[2:-1]根据数据调整！！
-        df_pred = pd.DataFrame(preds, columns=df_raw.columns[2: -1].map(lambda x: x + '_pred'))
         df_raw = df_raw.iloc[args.seq_len: args.seq_len + preds.shape[0], :]
         df_raw.reset_index(drop=True, inplace=True)
+        df_pred = pd.DataFrame(preds, columns=df_raw.columns[2: -1].map(lambda x: x + '_pred'))
+        
         df_raw = pd.concat([df_raw, df_pred], axis=1)
+        df_raw = pd.concat([df_raw, predf], axis=1)
+
         ## print(df_raw.info())
         new_dir = os.path.dirname(path) + '_pred'
         if not os.path.exists(new_dir):
