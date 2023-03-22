@@ -313,12 +313,12 @@ class Exp_Informer(Exp_Basic):
         # KPI 新增一列预测异常列                      
         residuals = pd.DataFrame(trues - preds).abs().sum(axis=1)
      
-        Q = 0.98
+        Q = 0.99
         print('Q:',Q)
         UCL = 3/2*residuals.quantile(Q)
         print('0.98UCL:',residuals.quantile(0.98))
         print('0.99UCL',residuals.quantile(0.99))
-        print('1.5*0.98UCL:',UCL)
+        print('1.5*0.99UCL:',UCL)
         
         prediction = pd.Series((residuals>UCL).astype(int).values,index=df_raw[args.seq_len: args.seq_len + preds.shape[0]:].index).fillna(0)
         predf = prediction.to_frame()
