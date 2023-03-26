@@ -1,4 +1,4 @@
-from data.data_loader import Dataset_ETT_hour, Dataset_ETT_minute, Dataset_Custom, Dataset_Pred, Dataset_SKAB_Anomaly,Dataset_KPI_Anomaly,Dataset_yahoo_Anomaly
+from data.data_loader import Dataset_ETT_hour, Dataset_ETT_minute, Dataset_Custom, Dataset_Pred, Dataset_SKAB_Anomaly,Dataset_KPI_Anomaly,Dataset_yahoo_Anomaly,Dataset_yahooA1_Anomaly
 from exp.exp_basic import Exp_Basic
 from models.model import Informer, InformerStack, STformer
 
@@ -104,6 +104,7 @@ class Exp_Informer(Exp_Basic):
             'SKAB': Dataset_SKAB_Anomaly,
             'KPI': Dataset_KPI_Anomaly,
             'yahoo':Dataset_yahoo_Anomaly,
+            'yahooA1':Dataset_yahooA1_Anomaly,
         }
         Data = data_dict[self.args.data]
         timeenc = 0 if args.embed!='timeF' else 1
@@ -315,10 +316,10 @@ class Exp_Informer(Exp_Basic):
      
         Q = 0.99
         print('Q:',Q)
-        UCL = 1.6*residuals.quantile(Q)
+        UCL = 1.5*residuals.quantile(Q)
         print('0.98UCL:',residuals.quantile(0.98))
         print('0.99UCL',residuals.quantile(0.99))
-        print('1.6*0.99UCL:',UCL)
+        print('1.5*0.99UCL:',UCL)
         
         prediction = pd.Series((residuals>UCL).astype(int).values,index=df_raw[args.seq_len: args.seq_len + preds.shape[0]:].index).fillna(0)
         predf = prediction.to_frame()
@@ -331,7 +332,7 @@ class Exp_Informer(Exp_Basic):
         # 注意切片的列[2:-1]根据数据调整！！
         df_raw = df_raw.iloc[args.seq_len: args.seq_len + preds.shape[0], :]
         df_raw.reset_index(drop=True, inplace=True)
-        df_pred = pd.DataFrame(preds, columns=df_raw.columns[2: -1].map(lambda x: x + '_pred'))
+        df_pred = pd.DataFrame(preds, columns=df_raw.columns[1: -1].map(lambda x: x + '_pred'))
         
         df_raw = pd.concat([df_raw, df_pred], axis=1)
         df_raw = pd.concat([df_raw, predf], axis=1)
