@@ -1,4 +1,4 @@
-from data.data_loader import Dataset_ETT_hour, Dataset_ETT_minute, Dataset_Custom, Dataset_Pred, Dataset_SKAB_Anomaly,Dataset_KPI_Anomaly,Dataset_yahoo_Anomaly,Dataset_yahooA1_Anomaly
+from data.data_loader import Dataset_ETT_hour, Dataset_ETT_minute, Dataset_Custom, Dataset_Pred, Dataset_SKAB_Anomaly,Dataset_KPI_Anomaly,Dataset_yahoo_Anomaly,Dataset_yahooA1_Anomaly,Dataset_synthetic_Anomaly
 from exp.exp_basic import Exp_Basic
 from models.model import Informer, InformerStack, STformer
 
@@ -105,6 +105,7 @@ class Exp_Informer(Exp_Basic):
             'KPI': Dataset_KPI_Anomaly,
             'yahoo':Dataset_yahoo_Anomaly,
             'yahooA1':Dataset_yahooA1_Anomaly,
+            'synthetic':Dataset_synthetic_Anomaly,
         }
         Data = data_dict[self.args.data]
         timeenc = 0 if args.embed!='timeF' else 1
@@ -317,7 +318,6 @@ class Exp_Informer(Exp_Basic):
         Q = 0.99
         print('Q:',Q)
         UCL = 1.5*residuals.quantile(Q)
-        print('0.98UCL:',residuals.quantile(0.98))
         print('0.99UCL',residuals.quantile(0.99))
         print('1.5*0.99UCL:',UCL)
         
