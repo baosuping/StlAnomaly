@@ -317,9 +317,8 @@ class Exp_Informer(Exp_Basic):
      
         Q = 0.99
         print('Q:',Q)
-        UCL = 1.5*residuals.quantile(Q)
+        UCL = residuals.quantile(Q)
         print('0.99UCL',residuals.quantile(0.99))
-        print('1.5*0.99UCL:',UCL)
         
         prediction = pd.Series((residuals>UCL).astype(int).values,index=df_raw[args.seq_len: args.seq_len + preds.shape[0]:].index).fillna(0)
         predf = prediction.to_frame()
