@@ -332,7 +332,7 @@ class Exp_Informer(Exp_Basic):
         # 注意切片的列[2:-1]根据数据调整！！
         df_raw = df_raw.iloc[args.seq_len: args.seq_len + preds.shape[0], :]
         df_raw.reset_index(drop=True, inplace=True)
-        df_pred = pd.DataFrame(preds, columns=df_raw.columns[2: -1].map(lambda x: x + '_pred'))
+        df_pred = pd.DataFrame(preds, columns=df_raw.columns[1: -1].map(lambda x: x + '_pred'))
         
         df_raw = pd.concat([df_raw, df_pred], axis=1)
         df_raw = pd.concat([df_raw, predf], axis=1)
